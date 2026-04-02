@@ -6,7 +6,7 @@ import threading
 
 app = Flask(__name__)
 
-TELEGRAM_TOKEN = os.environ.get("BOT_TOKEN", "8657139653:AAH0eBi8NzXN1DvTqRQY9tfTGNxHM89ZL3I")
+TELEGRAM_TOKEN = os.environ.get("BOT_TOKEN", "8668464561:AAFCuZYgojo0VLaZLfP8mCJSAWTx4CJTBoU")
 CHAT_ID = os.environ.get("CHAT_ID", "6796711119")
 
 def send_message(chat_id, text):
@@ -117,7 +117,7 @@ def check_arbitrage():
             max_ex = max(prices, key=prices.get)
             diff = ((prices[max_ex] - prices[min_ex]) / prices[min_ex]) * 100
             
-            if diff > 0.5:
+            if diff > 0.5:  # ← CHANGED TO 0.5%
                 msg = f"🚨 {coin} ARBITRAGE!\nBuy {min_ex}: ${prices[min_ex]:.4f}\nSell {max_ex}: ${prices[max_ex]:.4f}\nProfit: {diff:.2f}%"
                 send_message(CHAT_ID, msg)
 
@@ -128,7 +128,7 @@ def webhook():
         chat_id = data['message']['chat']['id']
         text = data['message'].get('text', '')
         if text == '/start':
-            send_message(chat_id, "🤖 Arbitrage Bot active!\nMonitoring: SOL, DOGE, XRP, ADA, LINK, SUI, TON, MNT\nAlert when profit > 2%")
+            send_message(chat_id, "🤖 Arbitrage Bot active!\nMonitoring: SOL, DOGE, XRP, ADA, LINK, SUI, TON, MNT\nAlert when profit > 0.5%")
     return 'ok', 200
 
 @app.route('/')
