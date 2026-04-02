@@ -1,6 +1,10 @@
 import requests
 import time
 from telegram import Bot
+from flask import Flask
+import threading
+
+app = Flask(__name__)
 
 TELEGRAM_TOKEN = "8657139653:AAH0eBi8NzXN1DvTqRQY9tfTGNxHM89ZL3I"
 CHAT_ID = "6796711119"
@@ -73,6 +77,16 @@ def check_arbitrage():
     else:
         print(f"No profit. Best spread: {diff_percent:.2f}%")
 
-while True:
-    check_arbitrage()
-    time.sleep(30)
+def run_bot():
+    while True:
+        check_arbitrage()
+        time.sleep(30)
+
+@app.route('/')
+def home():
+    return "Arbitrage Bot is running!"
+
+if __name__ == "__main__":
+    thread = threading.Thread(target=run_bot)
+    thread.start()
+    app.run(host="0.0.0.0", port=10000)
