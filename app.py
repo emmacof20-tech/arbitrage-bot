@@ -117,7 +117,7 @@ def check_arbitrage():
             max_ex = max(prices, key=prices.get)
             diff = ((prices[max_ex] - prices[min_ex]) / prices[min_ex]) * 100
             
-            if diff > 2.0:
+            if diff > 0.5:
                 msg = f"🚨 {coin} ARBITRAGE!\nBuy {min_ex}: ${prices[min_ex]:.4f}\nSell {max_ex}: ${prices[max_ex]:.4f}\nProfit: {diff:.2f}%"
                 send_message(CHAT_ID, msg)
 
