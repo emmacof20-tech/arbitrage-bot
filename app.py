@@ -6,8 +6,8 @@ import threading
 
 app = Flask(__name__)
 
-TELEGRAM_TOKEN = os.environ.get("BOT_TOKEN", "8668464561:AAFCuZYgojo0VLaZLfP8mCJSAWTx4CJTBoU")
-CHAT_ID = os.environ.get("CHAT_ID", "6796711119")
+TELEGRAM_TOKEN = "8668464561:AAFCuZYgojo0VLaZLfP8mCJSAWTx4CJTBoU"
+CHAT_ID = "6796711119"
 
 def send_message(chat_id, text):
     url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
@@ -18,97 +18,71 @@ def send_message(chat_id, text):
 
 def check_arbitrage():
     coins = {
-        "SOL": {"symbol": "SOLUSDT", "exchanges": {
+        "SOL": {
             "Binance": "https://api.binance.com/api/v3/ticker/price?symbol=SOLUSDT",
             "Bybit": "https://api.bybit.com/v5/market/tickers?category=spot&symbol=SOLUSDT",
             "OKX": "https://www.okx.com/api/v5/market/ticker?instId=SOL-USDT",
-            "KuCoin": "https://api.kucoin.com/api/v1/market/orderbook/level1?symbol=SOL-USDT",
-            "Kraken": "https://api.kraken.com/0/public/Ticker?pair=SOLUSD",
-            "Coinbase": "https://api.coinbase.com/v2/prices/SOL-USD/spot",
-            "Gateio": "https://api.gateio.ws/api/v4/spot/tickers?currency_pair=SOL_USDT",
-            "Bitget": "https://api.bitget.com/api/v2/spot/market/tickers?symbol=SOLUSDT",
-            "MEXC": "https://api.mexc.com/api/v3/ticker/price?symbol=SOLUSDT",
-            "Crypto.com": "https://api.crypto.com/v2/public/get-ticker?instrument_name=SOL_USDT"
-        }},
-        "DOGE": {"symbol": "DOGEUSDT", "exchanges": {
+            "KuCoin": "https://api.kucoin.com/api/v1/market/orderbook/level1?symbol=SOL-USDT"
+        },
+        "DOGE": {
             "Binance": "https://api.binance.com/api/v3/ticker/price?symbol=DOGEUSDT",
             "Bybit": "https://api.bybit.com/v5/market/tickers?category=spot&symbol=DOGEUSDT",
             "OKX": "https://www.okx.com/api/v5/market/ticker?instId=DOGE-USDT",
-            "KuCoin": "https://api.kucoin.com/api/v1/market/orderbook/level1?symbol=DOGE-USDT",
-            "Gateio": "https://api.gateio.ws/api/v4/spot/tickers?currency_pair=DOGE_USDT",
-            "Bitget": "https://api.bitget.com/api/v2/spot/market/tickers?symbol=DOGEUSDT",
-            "MEXC": "https://api.mexc.com/api/v3/ticker/price?symbol=DOGEUSDT"
-        }},
-        "XRP": {"symbol": "XRPUSDT", "exchanges": {
+            "KuCoin": "https://api.kucoin.com/api/v1/market/orderbook/level1?symbol=DOGE-USDT"
+        },
+        "XRP": {
             "Binance": "https://api.binance.com/api/v3/ticker/price?symbol=XRPUSDT",
             "Bybit": "https://api.bybit.com/v5/market/tickers?category=spot&symbol=XRPUSDT",
             "OKX": "https://www.okx.com/api/v5/market/ticker?instId=XRP-USDT",
-            "KuCoin": "https://api.kucoin.com/api/v1/market/orderbook/level1?symbol=XRP-USDT",
-            "Gateio": "https://api.gateio.ws/api/v4/spot/tickers?currency_pair=XRP_USDT",
-            "Bitget": "https://api.bitget.com/api/v2/spot/market/tickers?symbol=XRPUSDT"
-        }},
-        "ADA": {"symbol": "ADAUSDT", "exchanges": {
+            "KuCoin": "https://api.kucoin.com/api/v1/market/orderbook/level1?symbol=XRP-USDT"
+        },
+        "ADA": {
             "Binance": "https://api.binance.com/api/v3/ticker/price?symbol=ADAUSDT",
             "Bybit": "https://api.bybit.com/v5/market/tickers?category=spot&symbol=ADAUSDT",
             "OKX": "https://www.okx.com/api/v5/market/ticker?instId=ADA-USDT",
-            "KuCoin": "https://api.kucoin.com/api/v1/market/orderbook/level1?symbol=ADA-USDT",
-            "Gateio": "https://api.gateio.ws/api/v4/spot/tickers?currency_pair=ADA_USDT"
-        }},
-        "LINK": {"symbol": "LINKUSDT", "exchanges": {
+            "KuCoin": "https://api.kucoin.com/api/v1/market/orderbook/level1?symbol=ADA-USDT"
+        },
+        "LINK": {
             "Binance": "https://api.binance.com/api/v3/ticker/price?symbol=LINKUSDT",
             "Bybit": "https://api.bybit.com/v5/market/tickers?category=spot&symbol=LINKUSDT",
             "OKX": "https://www.okx.com/api/v5/market/ticker?instId=LINK-USDT",
-            "KuCoin": "https://api.kucoin.com/api/v1/market/orderbook/level1?symbol=LINK-USDT",
-            "Gateio": "https://api.gateio.ws/api/v4/spot/tickers?currency_pair=LINK_USDT"
-        }},
-        "SUI": {"symbol": "SUIUSDT", "exchanges": {
+            "KuCoin": "https://api.kucoin.com/api/v1/market/orderbook/level1?symbol=LINK-USDT"
+        },
+        "SUI": {
             "Binance": "https://api.binance.com/api/v3/ticker/price?symbol=SUIUSDT",
             "Bybit": "https://api.bybit.com/v5/market/tickers?category=spot&symbol=SUIUSDT",
             "OKX": "https://www.okx.com/api/v5/market/ticker?instId=SUI-USDT",
-            "KuCoin": "https://api.kucoin.com/api/v1/market/orderbook/level1?symbol=SUI-USDT",
-            "Gateio": "https://api.gateio.ws/api/v4/spot/tickers?currency_pair=SUI_USDT"
-        }},
-        "TON": {"symbol": "TONUSDT", "exchanges": {
+            "KuCoin": "https://api.kucoin.com/api/v1/market/orderbook/level1?symbol=SUI-USDT"
+        },
+        "TON": {
             "Binance": "https://api.binance.com/api/v3/ticker/price?symbol=TONUSDT",
             "Bybit": "https://api.bybit.com/v5/market/tickers?category=spot&symbol=TONUSDT",
             "OKX": "https://www.okx.com/api/v5/market/ticker?instId=TON-USDT",
             "KuCoin": "https://api.kucoin.com/api/v1/market/orderbook/level1?symbol=TON-USDT"
-        }},
-        "MNT": {"symbol": "MNTUSDT", "exchanges": {
+        },
+        "MNT": {
             "Binance": "https://api.binance.com/api/v3/ticker/price?symbol=MNTUSDT",
             "Bybit": "https://api.bybit.com/v5/market/tickers?category=spot&symbol=MNTUSDT",
             "OKX": "https://www.okx.com/api/v5/market/ticker?instId=MNT-USDT",
             "KuCoin": "https://api.kucoin.com/api/v1/market/orderbook/level1?symbol=MNT-USDT"
-        }}
+        }
     }
     
-    for coin, data in coins.items():
+    for coin, exchanges in coins.items():
         prices = {}
-        for exchange, url in data["exchanges"].items():
+        for exchange, url in exchanges.items():
             try:
                 r = requests.get(url, timeout=5)
-                data_json = r.json()
+                data = r.json()
                 
                 if "binance" in url:
-                    prices[exchange] = float(data_json["price"])
+                    prices[exchange] = float(data["price"])
                 elif "bybit" in url:
-                    prices[exchange] = float(data_json["result"]["list"][0]["lastPrice"])
+                    prices[exchange] = float(data["result"]["list"][0]["lastPrice"])
                 elif "okx" in url:
-                    prices[exchange] = float(data_json["data"][0]["last"])
+                    prices[exchange] = float(data["data"][0]["last"])
                 elif "kucoin" in url:
-                    prices[exchange] = float(data_json["data"]["price"])
-                elif "gateio" in url:
-                    prices[exchange] = float(data_json[0]["last"])
-                elif "bitget" in url:
-                    prices[exchange] = float(data_json["data"][0]["lastPr"])
-                elif "mexc" in url:
-                    prices[exchange] = float(data_json["price"])
-                elif "crypto.com" in url:
-                    prices[exchange] = float(data_json["result"]["data"]["b"])
-                elif "coinbase" in url:
-                    prices[exchange] = float(data_json["data"]["amount"])
-                elif "kraken" in url:
-                    prices[exchange] = float(data_json["result"]["XSOLZUSD"]["c"][0])
+                    prices[exchange] = float(data["data"]["price"])
             except:
                 pass
         
@@ -117,7 +91,7 @@ def check_arbitrage():
             max_ex = max(prices, key=prices.get)
             diff = ((prices[max_ex] - prices[min_ex]) / prices[min_ex]) * 100
             
-            if diff > 0.5:  # ← CHANGED TO 0.5%
+            if diff > 0.5:
                 msg = f"🚨 {coin} ARBITRAGE!\nBuy {min_ex}: ${prices[min_ex]:.4f}\nSell {max_ex}: ${prices[max_ex]:.4f}\nProfit: {diff:.2f}%"
                 send_message(CHAT_ID, msg)
 
