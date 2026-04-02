@@ -1,26 +1,20 @@
+from flask import Flask, request
 import requests
 import time
 import os
-from telegram import Bot
-from telegram.ext import Updater, CommandHandler
+import threading
+
+app = Flask(__name__)
 
 TELEGRAM_TOKEN = os.environ.get("BOT_TOKEN", "8657139653:AAH0eBi8NzXN1DvTqRQY9tfTGNxHM89ZL3I")
 CHAT_ID = os.environ.get("CHAT_ID", "6796711119")
 
-bot = Bot(token=TELEGRAM_TOKEN)
-
-def start(update, context):
-    update.message.reply_text("🤖 Arbitrage Bot active!\nMonitoring: SOL, DOGE, XRP, ADA, LINK, SUI, TON, MNT\nAlert when profit > 1.5%")
-
-def get_price(name, symbol, exchange, url, json_path):
+def send_message(chat_id, text):
+    url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
     try:
-        r = requests.get(url, timeout=5)
-        data = r.json()
-        for key in json_path:
-            data = data[key]
-        return float(data)
+        requests.post(url, json={"chat_id": chat_id, "text": text}, timeout=5)
     except:
-        return None
+        pass
 
 def check_arbitrage():
     coins = {
@@ -95,7 +89,6 @@ def check_arbitrage():
                 r = requests.get(url, timeout=5)
                 data_json = r.json()
                 
-                # Parse different exchange response formats
                 if "binance" in url:
                     prices[exchange] = float(data_json["price"])
                 elif "bybit" in url:
@@ -124,25 +117,30 @@ def check_arbitrage():
             max_ex = max(prices, key=prices.get)
             diff = ((prices[max_ex] - prices[min_ex]) / prices[min_ex]) * 100
             
-            if diff > 1.5:
+            if diff > 2.0:
                 msg = f"🚨 {coin} ARBITRAGE!\nBuy {min_ex}: ${prices[min_ex]:.4f}\nSell {max_ex}: ${prices[max_ex]:.4f}\nProfit: {diff:.2f}%"
-                try:
-                    bot.send_message(chat_id=CHAT_ID, text=msg)
-                    print(f"{coin} alert sent! {diff:.2f}%")
-                except:
-                    pass
+                send_message(CHAT_ID, msg)
 
-def run_bot():
-    print("Multi-coin arbitrage bot started! Checking 8 coins every 60 seconds...")
+@app.route(f'/webhook/{TELEGRAM_TOKEN}', methods=['POST'])
+def webhook():
+    data = request.get_json()
+    if data and 'message' in data:
+        chat_id = data['message']['chat']['id']
+        text = data['message'].get('text', '')
+        if text == '/start':
+            send_message(chat_id, "🤖 Arbitrage Bot active!\nMonitoring: SOL, DOGE, XRP, ADA, LINK, SUI, TON, MNT\nAlert when profit > 2%")
+    return 'ok', 200
+
+@app.route('/')
+def home():
+    return "Arbitrage Bot is running!"
+
+def run_arbitrage():
     while True:
         check_arbitrage()
         time.sleep(60)
 
 if __name__ == "__main__":
-    updater = Updater(token=TELEGRAM_TOKEN, use_context=True)
-    dp = updater.dispatcher
-    dp.add_handler(CommandHandler("start", start))
-    
-    updater.start_polling()
-    print("Telegram bot running...")
-    run_bot()
+    threading.Thread(target=run_arbitrage).start()
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
